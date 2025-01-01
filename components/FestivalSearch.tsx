@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Button, List, Typography } from "antd";
+import { Input, Button, List, Typography, Divider, Tag } from "antd";
+import { CalendarOutlined } from "@ant-design/icons";
 
 // 型定義
 type Festival = {
@@ -14,6 +15,21 @@ type Festival = {
 };
 
 const { Title, Text, Link } = Typography;
+
+const months = [
+  "1月",
+  "2月",
+  "3月",
+  "4月",
+  "5月",
+  "6月",
+  "7月",
+  "8月",
+  "9月",
+  "10月",
+  "11月",
+  "12月",
+];
 
 export default function FestivalSearch() {
   const [searchTerm, setSearchTerm] = useState<string>(""); // 検索ワード
@@ -53,6 +69,15 @@ export default function FestivalSearch() {
       festival.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const groupedFestivals = filteredFestivals.reduce((acc, festival) => {
+    const month = new Date(festival.startDate).getMonth();
+    if (!acc[month]) {
+      acc[month] = [];
+    }
+    acc[month].push(festival);
+    return acc;
+  }, {} as Record<number, Festival[]>);
+
   return (
     <div>
       <Title level={2}>検索</Title>
@@ -72,27 +97,37 @@ export default function FestivalSearch() {
       {loading ? (
         <Text>読み込み中...</Text>
       ) : (
-        <List
-          itemLayout="vertical"
-          dataSource={filteredFestivals}
-          renderItem={(festival: Festival) => (
-            <List.Item key={festival.id}>
-              <Title level={4}>{festival.name}</Title>
-              <Text>
-                日付: {new Date(festival.startDate).toLocaleDateString()} ~{" "}
-                {new Date(festival.endDate).toLocaleDateString()}
-              </Text>
-              <br />
-              <Text>アーティスト: {festival.artists}</Text>
-              <br />
-              {festival.url && (
-                <Link href={festival.url} target="_blank">
-                  詳細を見る
-                </Link>
+        Object.entries(groupedFestivals).map(([month, festivalList]) => (
+          <div key={month} style={{ marginBottom: 24 }}>
+            <Divider orientation="left">
+              <Tag color="blue" style={{ fontSize: 16, padding: "4px 8px" }}>
+                <CalendarOutlined style={{ marginRight: 8 }} />
+                {months[parseInt(month)]}
+              </Tag>
+            </Divider>
+            <List
+              itemLayout="vertical"
+              dataSource={festivalList}
+              renderItem={(festival: Festival) => (
+                <List.Item key={festival.id}>
+                  <Title level={4}>{festival.name}</Title>
+                  <Text>
+                    日付: {new Date(festival.startDate).toLocaleDateString()} ~{" "}
+                    {new Date(festival.endDate).toLocaleDateString()}
+                  </Text>
+                  <br />
+                  <Text>アーティスト: {festival.artists}</Text>
+                  <br />
+                  {festival.url && (
+                    <Link href={festival.url} target="_blank">
+                      詳細を見る
+                    </Link>
+                  )}
+                </List.Item>
               )}
-            </List.Item>
-          )}
-        />
+            />
+          </div>
+        ))
       )}
     </div>
   );
