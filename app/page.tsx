@@ -1,15 +1,13 @@
 "use client";
 
 import { Tabs } from "antd";
-import ArtistSearch from "../components/ArtistSearch";
 import FestivalSearch from "../components/FestivalSearch";
-import FestivalCalendar from "../components/FestivalCalendar";
 import FestivalImport from "../components/FestivalImport";
 import { FestivalProvider } from "../context/FestivalContext";
 
 export default function Home() {
   const items = [
-    { key: "1", label: "アーティスト検索", children: <ArtistSearch /> },
+    { key: "1", label: "検索", children: <FestivalSearch /> },
     // { key: "2", label: "フェス検索", children: <FestivalSearch /> },
     // { key: "3", label: "フェスカレンダー", children: <FestivalCalendar /> },
     { key: "4", label: "フェス取り込み", children: <FestivalImport /> },
